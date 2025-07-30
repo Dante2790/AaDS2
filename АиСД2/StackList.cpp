@@ -26,7 +26,7 @@ void StackList<T>::push(const T& data) {
 			this->top = new_node;
 			break;
 		}
-		cout << data << "\n";
+		//cout << data << "\n";
 	}
 	catch (out_of_range er) {
 		cerr << "error: " << er.what() << "\n";
@@ -46,13 +46,18 @@ T StackList<T>::pop() {
 		T current = this->top->data;
 		Node* current_next = this->top->next;
 		delete this->top;
-		this->top = current_next;
+		if (current_next) {
+			this->top = current_next;
+		}
+		else {
+			this->top = nullptr;
+		}
 		cout << current << '\n';
 		return current;
 	}
 	catch (out_of_range er) {
 		cerr << "error: " << er.what() << "\n";
-		T er_current = '~';
+		T er_current = '~\n';
 		return er_current;
 	}
 }
