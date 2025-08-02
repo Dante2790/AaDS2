@@ -1,4 +1,5 @@
 #include "StackList.h"
+#include <iostream>
 template <typename T>
 StackList<T>::StackList() :
 	top(nullptr)
@@ -87,6 +88,10 @@ void StackList<T>::print() {
 template <typename T>
 bool StackList<T>::isEmpty() {
 	return this->top == nullptr;
+}
+template <typename T>
+T StackList<T>::getTop() {
+	return this->isEmpty() ? '\n' : this->top->data;
 }
 
 template class StackList<char>;
