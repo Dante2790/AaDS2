@@ -143,8 +143,8 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 	StackList<char> stack;
 	int numberOfBrackets = 0;
 	string strPostfix;
-	
 	char current = infix[0];
+	////////////////////////////////////////////////////////
 	for (int i = 0; i < strlen(infix); i++) {
 		current = infix[i];
 		if (current == '\n') {
@@ -154,6 +154,7 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 			break;
 		}
 		switch (current) {
+		//////////////////
 		case '(':
 			numberOfBrackets++;
 			stack.push(current);
@@ -187,10 +188,7 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 				}
 				i++;
 				current = infix[i];
-			}
-			//stack.push(current);
-			//stack.pop();
-			
+			}			
 			while (stack.getTop() != '\n') {
 				if (stack.getTop() == '(' || stack.getTop() == ')') {
 					stack.pop();
@@ -199,9 +197,9 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 					strPostfix += stack.pop();
 				}
 			}
-			//stack.pop();
 			i--;
 			break;
+		//////////////////
 		case ')':
 			while (stack.getTop() != '\n') {
 				if (stack.getTop() == '(') {
@@ -212,10 +210,12 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 				}
 			}
 			break;
+		//////////////////
 		case '+':
 		case '-':
 			stack.push(current);
 			break;
+		//////////////////
 		case '*':
 		case '/':
 			stack.push(current);
@@ -248,9 +248,3 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 	postfix[strlen(infix) + 1] = '\n';
 	
 }
-
-
-//						2+2+2+2+2+2				(2+3*4+5+5)    234+*
-//												+++	
-//												(2+3*4+5+5)
-//												234*55+++
