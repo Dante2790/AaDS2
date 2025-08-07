@@ -1,6 +1,7 @@
 #ifndef STACKLIST_H
 #define STACKLIST_H
 
+#include <stdexcept>
 #include "stack.h"
 template <typename T>
 class StackList : public Stack <T> {
@@ -28,6 +29,14 @@ public:
     
     void print();
     T getTop();
+};
+
+class StackOverflow : public overflow_error {
+
+};
+
+class StackUnderflow : public underflow_error {
+
 };
 
 #endif;

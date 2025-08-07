@@ -11,31 +11,25 @@ bool checkWrongSymbols(const string& checkStr);
 bool checkBracketsCorrectness(string strForCheck);
 
 int main() {
-	char f = '6';
-	char t = '8';
-	StackList<char> a, b;
-	a.push(f);
-	a.push(t);
-	a.push('a');
-	a.push('2');
-	a.print();
-	a.pop();
-	a.pop();
-	a.print();
-	b.print();
-	string source = "4*(5+6*(5+4)+(-9))/(5*5-8*8)";
+	string source4 = "(9+(4-4)+3+4)";
+	string source3 = "(9-((8*(7-(6/(5+4))))+(3*(2-1))))/((1+2)*(3-(4/(5+6))))";
+	string source2 = "((3+7)*(5-(2/(6+1))))-(4*(9-(8/2)))";
+	string source = "5 + (-7) + 4*(5+6*(5+4)+(-9))/(5*5-8*8)";
 	//getline(cin, source);
-	cout << '\n' << source << '\n';
-	eraseWrongSymbols(source);
-	switch (checkWrongSymbols(source)) {
+	
+	
+	switch (checkWrongSymbols(source3)) {
 	case true:
-		cout << source << '\n';
 
 
-		cout << "-----------" << '\n' << source << '\n';
+		cout << "-----------" << '\n' << source3 << '\n';
 		try {
-			const char* infix = source.c_str();
-			char* postfix = new char[strlen(infix) + 2];
+			eraseWrongSymbols(source3);
+			if (checkBracketsCorrectness(source3)) {
+				cout << "----------------------------------------------------------" << '\n';
+			}
+			const char* infix = source3.c_str();
+			char* postfix = new char[(strlen(infix)*2) + 2];
 			//strcpy_s(postfix, (sizeof(postfix)), infix);
 			cout << postfix << '\n';
 			getPostfixFromInfix(infix, postfix);
@@ -83,6 +77,11 @@ bool checkWrongSymbols(const string& checkStr) {
 	int numberOfErrors = 0;
 	int numberOfBrackets = 0;
 	////////////////////////////////////////////
+	if (checkStr.empty()) {
+		numberOfErrors++;
+	}
+	////////////////////////////////////////////
+	/*
 	for (int i = 0; i < (checkStr.size()); i++) {
 		current = checkStr[i];
 		if (current == '(') {
@@ -92,6 +91,7 @@ bool checkWrongSymbols(const string& checkStr) {
 			numberOfErrors--;
 		}
 	}
+	*/
 	////////////////////////////////////////////
 	/*for (int i = 0; i < (checkStr.size()); i++) {
 		current = checkStr[i];
@@ -125,10 +125,10 @@ bool checkWrongSymbols(const string& checkStr) {
 	////////////////////////////////////////////
 	for (int i = 0; i < (checkStr.size()); i++) {
 		current = checkStr[i];
-		if ((current == '+' && checkStr[i + 1] == '+') ||
-			(current == '-' && checkStr[i + 1] == '-') ||
-			(current == '*' && checkStr[i + 1] == '*') ||
-			(current == '/' && checkStr[i + 1] == '/')) {
+		if ((current == '+' || current == '-' ||
+			current == '/' || current == '*') &&
+			(checkStr[i + 1] == '+' || checkStr[i + 1] == '-' ||
+				checkStr[i + 1] == '*' || checkStr[i + 1] == '/')) {
 			numberOfErrors++;
 		}
 	}
@@ -148,11 +148,13 @@ bool checkWrongSymbols(const string& checkStr) {
 	if (numberOfErrors == 0) {
 		return true;
 	}
+	cout << "your arithmetic expression is uncorrect";
 	return false;
 }
 
 bool checkBracketsCorrectness(string strForCheck) {
 	char current = strForCheck[0];
+	static bool flag = false;
 	static int numberOfBrackets;
 	static int j;
 	static int depthOfBrackets;
@@ -164,23 +166,33 @@ bool checkBracketsCorrectness(string strForCheck) {
 		if (current == '(') {
 			numberOfBrackets++;
 			while ((numberOfBrackets != 0) && (i < strForCheck.size())) {
+				if (j > i) {
+					i = j;
+				}
 				i++;
 				current = strForCheck[i];
 				if (current == '(') {
 					j = i;
 					depthOfBrackets++;
 					checkBracketsCorrectness(strForCheck);
+					if (flag == false) {
+						return false;
+					}
 				}
 				else if (current == ')') {
 					numberOfBrackets--;
 					if (depthOfBrackets > 0) {
 						strForCheck.erase(i, 1);
 						depthOfBrackets--;
+						j = i;
+						flag = true;
+						return true;
 					}
 				}
 			}
 		}
 	}
+	//j = strForCheck.size();
 	return numberOfBrackets == 0 ? true : false;
 }
 
@@ -191,6 +203,7 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 	string strPostfix;
 	char current = infix[0];
 	char temp = current;
+	int counter = 0;
 	////////////////////////////////////////////////////////
 	for (int i = 0; i < strlen(infix); i++) {
 		current = infix[i];
@@ -203,6 +216,11 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 		switch (current) {
 		//////////////////
 		case '(':
+			current = stack.getTop();
+			if (current == '*' || current == '/') {
+				counter++;
+			}
+			current = infix[i];
 			numberOfBrackets++;
 			stack.push(current);
 			i++;
@@ -210,6 +228,7 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 			while (numberOfBrackets != 0) {
 				if (isdigit(current)) {
 					strPostfix += current;
+					strPostfix += ' ';
 				}
 				else if (current == '*' || current == '/') {
 					stack.push(current);
@@ -217,13 +236,24 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 					}
 					else {
 						strPostfix += infix[i + 1];
+						strPostfix += ' ';
 						strPostfix += stack.pop();
+						strPostfix += ' ';
 						i++;
 					}
 				}
 				else if (current == '+' || current == '-') {
-					
-					stack.push(current);
+					if (current == '-' && isdigit(infix[i + 1]) && infix[i + 2] == ')' && infix[i-1] == '(') {
+						strPostfix += current;
+						strPostfix += infix[i + 1];
+						strPostfix += ' ';
+						i += 2;
+						
+						numberOfBrackets--;
+					}
+					else {
+						stack.push(current);
+					}
 				}
 				else if (current == '(') {
 					numberOfBrackets++;
@@ -233,35 +263,53 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 					numberOfBrackets--;
 					stack.push(current);
 					while (stack.getTop() != '\n') {
-						if (stack.getTop() == ')') {
+						current = stack.getTop();
+						if (current == ')') {
+							
 							stack.pop();
 						}
-						else if (stack.getTop() == '(') {
+						else if (current == '(') {
 							stack.pop();
-							if (stack.getTop() == '*' || stack.getTop() == '/') {
+							/*
+							current = stack.getTop();
+							
+							if (current == '*' || current == '/' || current == '+' || current == '-') {
 								strPostfix += stack.pop();
+								strPostfix += ' ';
+							}
+							*/
+							if (counter > 0 && stack.getTop() != '(') {
+								strPostfix += stack.pop();
+								strPostfix += ' ';
+								counter--;
 							}
 							break;
 						}
+						/*
 						else if (stack.getTop() == '-') {
 							temp = stack.pop();
 							if (stack.getTop() == '(') {
 								stack.pop();
 								if (stack.getTop() == '+') {
 									strPostfix += '-';
+									strPostfix += ' ';
 									stack.pop();
 								}
 								else if (stack.getTop() == '-') {
 									strPostfix += '+';
+									strPostfix += ' ';
 									stack.pop();
 								}
 								else {
 									strPostfix += temp;
+									strPostfix += ' ';
 								}
 						}
-						}
+						*/
+						//}
 						else {
 							strPostfix += stack.pop();
+							strPostfix += ' ';
 						}
 					}
 				}
@@ -269,13 +317,26 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 				current = infix[i];
 			}			
 			while (stack.getTop() != '\n') {
-				if (stack.getTop() == '(' || stack.getTop() == ')') {
+				current = stack.getTop();
+				if (current == ')') {
 					stack.pop();
+				}
+				else if (current == '(') {
+					stack.pop();
+					break;
 				}
 				else {
 					strPostfix += stack.pop();
+					strPostfix += ' ';
 				}
+				
 			}
+			if (counter > 0) {
+				strPostfix += stack.pop();
+				strPostfix += ' ';
+				counter--;
+			}
+			
 			i--;
 			break;
 		//////////////////
@@ -286,6 +347,7 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 				}
 				else {
 					strPostfix += stack.pop();
+					strPostfix += ' ';
 				}
 			}
 			break;
@@ -304,13 +366,16 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 			i++;
 			current = infix[i];
 			strPostfix += current;
+			strPostfix += ' ';
 			strPostfix += stack.pop();
+			strPostfix += ' ';
 			break;
 		case '\n':
 			;
 			return;
 		default:
 			strPostfix += infix[i];
+			strPostfix += ' ';
 			break;
 		}
 		
@@ -322,9 +387,10 @@ void getPostfixFromInfix(const char* infix, char* postfix) {
 		}
 		else {
 			strPostfix += stack.pop();
+			strPostfix += ' ';
 		}
 	}
 	strcpy_s(postfix, strlen(strPostfix.c_str())+1, strPostfix.c_str());
-	postfix[strlen(infix) + 1] = '\n';
+	postfix[strlen(postfix) + 1] = '\n';
 	////////////////////////////////////////////////////////////////////
 }

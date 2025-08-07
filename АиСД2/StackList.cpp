@@ -53,7 +53,7 @@ T StackList<T>::pop() {
 		else {
 			this->top = nullptr;
 		}
-		cout << current << '\n';
+		//cout << current << '\n';
 		return current;
 	}
 	catch (out_of_range er) {
