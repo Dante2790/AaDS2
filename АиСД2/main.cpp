@@ -9,6 +9,7 @@ void getPostfixFromInfix(const char* infix, char* postfix);
 void eraseWrongSymbols(string& str);
 bool checkWrongSymbols(const string& checkStr);
 bool checkBracketsCorrectness(string strForCheck);
+
 void test01();
 void test02();
 void test03();
@@ -42,10 +43,6 @@ void eraseWrongSymbols(string &str) {
 	}
 	return;
 }
-
-
-
-
 
 bool checkWrongSymbols(const string& checkStr) {
 	char current = checkStr[0];
