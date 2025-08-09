@@ -32,11 +32,19 @@ public:
 };
 
 class StackOverflow : public overflow_error {
-
+private:
+    string message;
+public:
+    explicit StackOverflow(const string& msg) : overflow_error(msg), message(msg) {}
+    const char* what() const noexcept override { return message.c_str(); }
 };
 
 class StackUnderflow : public underflow_error {
-
+private:
+    string message;
+public:
+    explicit StackUnderflow(const string& msg) : underflow_error(msg), message(msg) {}
+    const char* what() const noexcept override { return message.c_str(); }
 };
 
 #endif;

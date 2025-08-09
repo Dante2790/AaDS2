@@ -9,46 +9,21 @@ void getPostfixFromInfix(const char* infix, char* postfix);
 void eraseWrongSymbols(string& str);
 bool checkWrongSymbols(const string& checkStr);
 bool checkBracketsCorrectness(string strForCheck);
+void test01();
+void test02();
+void test03();
+void test04();
+void test05();
+
+//////////////
 
 int main() {
-	string source4 = "(9+(4-4)+3+4)";
-	string source3 = "(9-((8*(7-(6/(5+4))))+(3*(2-1))))/((1+2)*(3-(4/(5+6))))";
-	string source2 = "((3+7)*(5-(2/(6+1))))-(4*(9-(8/2)))";
-	string source = "5 + (-7) + 4*(5+6*(5+4)+(-9))/(5*5-8*8)";
-	//getline(cin, source);
-	
-	
-	switch (checkWrongSymbols(source3)) {
-	case true:
-
-
-		cout << "-----------" << '\n' << source3 << '\n';
-		try {
-			eraseWrongSymbols(source3);
-			if (checkBracketsCorrectness(source3)) {
-				cout << "----------------------------------------------------------" << '\n';
-			}
-			const char* infix = source3.c_str();
-			char* postfix = new char[(strlen(infix)*2) + 2];
-			//strcpy_s(postfix, (sizeof(postfix)), infix);
-			cout << postfix << '\n';
-			getPostfixFromInfix(infix, postfix);
-			cout << "-----------" << '\n' << infix << '\n' << postfix << '\n';
-			delete[] postfix;
-			return 0;
-		}
-		catch (out_of_range er) {
-			cerr << "error: " << er.what() << "\n";
-			return 1;
-		}
-		catch (invalid_argument er) {
-			cerr << "error: " << er.what() << "\n";
-			return 1;
-		}
-	case false:
-		cout << "no";
-
-	}
+	test01();
+	test02();
+	test03();
+	test04();
+	test05();
+	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -81,34 +56,6 @@ bool checkWrongSymbols(const string& checkStr) {
 		numberOfErrors++;
 	}
 	////////////////////////////////////////////
-	/*
-	for (int i = 0; i < (checkStr.size()); i++) {
-		current = checkStr[i];
-		if (current == '(') {
-			numberOfErrors++;
-		}
-		else if (current == ')') {
-			numberOfErrors--;
-		}
-	}
-	*/
-	////////////////////////////////////////////
-	/*for (int i = 0; i < (checkStr.size()); i++) {
-		current = checkStr[i];
-		if (current == '(') {
-			numberOfBrackets++;
-			int j = i;
-			numberOfErrors++;
-			while ((current != ')') && (i < checkStr.size()) && (numberOfBrackets != 0)) {
-				i++;
-				current = checkStr[i];
-			}
-			if (current == ')') {
-				numberOfErrors--;
-			}
-		}
-	}*/
-
 	if (!checkBracketsCorrectness(checkStr)) {
 		numberOfErrors++;
 	}
@@ -148,7 +95,7 @@ bool checkWrongSymbols(const string& checkStr) {
 	if (numberOfErrors == 0) {
 		return true;
 	}
-	cout << "your arithmetic expression is uncorrect";
+	
 	return false;
 }
 
@@ -159,10 +106,18 @@ bool checkBracketsCorrectness(string strForCheck) {
 	static int j;
 	static int depthOfBrackets;
 	for (int i = 0; i < strForCheck.size(); i++) {
+		if (i == j && j == 0) {
+			numberOfBrackets = 0;
+			flag = false;
+			depthOfBrackets = 0;
+		}
 		if (j > i) {
 			i = j;
 		}
 		current = strForCheck[i];
+		if (current == ')' && numberOfBrackets == 0) {
+			return false;
+		}
 		if (current == '(') {
 			numberOfBrackets++;
 			while ((numberOfBrackets != 0) && (i < strForCheck.size())) {
@@ -192,205 +147,417 @@ bool checkBracketsCorrectness(string strForCheck) {
 			}
 		}
 	}
-	//j = strForCheck.size();
+	j = 0;
+	
 	return numberOfBrackets == 0 ? true : false;
 }
 
 void getPostfixFromInfix(const char* infix, char* postfix) {
-	cout << "magic!" << '\n' << " - - ~" << '\n';
-	StackList<char> stack;
-	int numberOfBrackets = 0;
-	string strPostfix;
-	char current = infix[0];
-	char temp = current;
-	int counter = 0;
-	////////////////////////////////////////////////////////
-	for (int i = 0; i < strlen(infix); i++) {
-		current = infix[i];
-		if (current == '\n') {
-			break;
+
+	try {
+		StackList<char> stack;
+		int numberOfBrackets = 0;
+		string tempStr = infix;
+		if (!(checkWrongSymbols(tempStr))) {
+			throw invalid_argument("your arithmetic expression is uncorrect");
 		}
-		else if (!current) {
-			break;
-		}
-		switch (current) {
-		//////////////////
-		case '(':
-			current = stack.getTop();
-			if (current == '*' || current == '/') {
-				counter++;
+		string strPostfix;
+		char current = infix[0];
+		char tempChr = current;
+		int counter = 0;
+		////////////////////////////////////////////////////////
+		for (int i = 0; i < strlen(infix); i++) {
+			current = infix[i];
+			if (current == '\n') {
+				break;
 			}
-			current = infix[i];
-			numberOfBrackets++;
-			stack.push(current);
-			i++;
-			current = infix[i];
-			while (numberOfBrackets != 0) {
-				if (isdigit(current)) {
-					strPostfix += current;
-					strPostfix += ' ';
+			else if (!current) {
+				break;
+			}
+			switch (current) {
+				//////////////////
+			case '(':
+				current = stack.getTop();
+				if (current == '*' || current == '/') {
+					counter++;
 				}
-				else if (current == '*' || current == '/') {
-					stack.push(current);
-					if (infix[i + 1] == '(') {
-					}
-					else {
-						strPostfix += infix[i + 1];
-						strPostfix += ' ';
-						strPostfix += stack.pop();
-						strPostfix += ' ';
-						i++;
-					}
-				}
-				else if (current == '+' || current == '-') {
-					if (current == '-' && isdigit(infix[i + 1]) && infix[i + 2] == ')' && infix[i-1] == '(') {
+				current = infix[i];
+				numberOfBrackets++;
+				stack.push(current);
+				i++;
+				current = infix[i];
+				while (numberOfBrackets != 0) {
+					if (isdigit(current)) {
 						strPostfix += current;
-						strPostfix += infix[i + 1];
 						strPostfix += ' ';
-						i += 2;
-						
-						numberOfBrackets--;
 					}
-					else {
+					else if (current == '*' || current == '/') {
 						stack.push(current);
-					}
-				}
-				else if (current == '(') {
-					numberOfBrackets++;
-					stack.push(current);
-				}
-				else if (current == ')') {
-					numberOfBrackets--;
-					stack.push(current);
-					while (stack.getTop() != '\n') {
-						current = stack.getTop();
-						if (current == ')') {
-							
-							stack.pop();
+						if (infix[i + 1] == '(') {
 						}
-						else if (current == '(') {
-							stack.pop();
-							/*
-							current = stack.getTop();
-							
-							if (current == '*' || current == '/' || current == '+' || current == '-') {
-								strPostfix += stack.pop();
-								strPostfix += ' ';
-							}
-							*/
-							if (counter > 0 && stack.getTop() != '(') {
-								strPostfix += stack.pop();
-								strPostfix += ' ';
-								counter--;
-							}
-							break;
-						}
-						/*
-						else if (stack.getTop() == '-') {
-							temp = stack.pop();
-							if (stack.getTop() == '(') {
-								stack.pop();
-								if (stack.getTop() == '+') {
-									strPostfix += '-';
-									strPostfix += ' ';
-									stack.pop();
-								}
-								else if (stack.getTop() == '-') {
-									strPostfix += '+';
-									strPostfix += ' ';
-									stack.pop();
-								}
-								else {
-									strPostfix += temp;
-									strPostfix += ' ';
-								}
-						}
-						*/
-						//}
 						else {
+							strPostfix += infix[i + 1];
+							strPostfix += ' ';
 							strPostfix += stack.pop();
 							strPostfix += ' ';
+							i++;
 						}
 					}
+					else if (current == '+' || current == '-') {
+						if (current == '-' && isdigit(infix[i + 1]) && infix[i + 2] == ')' && infix[i - 1] == '(') {
+							strPostfix += current;
+							strPostfix += infix[i + 1];
+							strPostfix += ' ';
+							i += 2;
+
+							numberOfBrackets--;
+						}
+						else {
+							stack.push(current);
+						}
+					}
+					else if (current == '(') {
+						numberOfBrackets++;
+						stack.push(current);
+					}
+					else if (current == ')') {
+						numberOfBrackets--;
+						stack.push(current);
+						while (stack.getTop() != '\n') {
+							current = stack.getTop();
+							if (current == ')') {
+
+								stack.pop();
+							}
+							else if (current == '(') {
+								stack.pop();
+								if (counter > 0 && stack.getTop() != '(') {
+									strPostfix += stack.pop();
+									strPostfix += ' ';
+									counter--;
+								}
+								break;
+							}
+							else {
+								strPostfix += stack.pop();
+								strPostfix += ' ';
+							}
+						}
+					}
+					i++;
+					current = infix[i];
+				}
+				while (stack.getTop() != '\n') {
+					current = stack.getTop();
+					if (current == ')') {
+						stack.pop();
+					}
+					else if (current == '(') {
+						stack.pop();
+						break;
+					}
+					else {
+						strPostfix += stack.pop();
+						strPostfix += ' ';
+					}
+
+				}
+				if (counter > 0) {
+					strPostfix += stack.pop();
+					strPostfix += ' ';
+					counter--;
+				}
+
+				i--;
+				break;
+				//////////////////
+			case ')':
+				while (stack.getTop() != '\n') {
+					if (stack.getTop() == '(') {
+						stack.pop();
+					}
+					else {
+						strPostfix += stack.pop();
+						strPostfix += ' ';
+					}
+				}
+				break;
+				//////////////////
+			case '+':
+			case '-':
+				stack.push(current);
+				break;
+				//////////////////
+			case '*':
+			case '/':
+				stack.push(current);
+				if (infix[i + 1] == '(') {
+					break;
 				}
 				i++;
 				current = infix[i];
-			}			
-			while (stack.getTop() != '\n') {
-				current = stack.getTop();
-				if (current == ')') {
-					stack.pop();
-				}
-				else if (current == '(') {
-					stack.pop();
-					break;
-				}
-				else {
-					strPostfix += stack.pop();
-					strPostfix += ' ';
-				}
-				
-			}
-			if (counter > 0) {
+				strPostfix += current;
+				strPostfix += ' ';
 				strPostfix += stack.pop();
 				strPostfix += ' ';
-				counter--;
-			}
-			
-			i--;
-			break;
-		//////////////////
-		case ')':
-			while (stack.getTop() != '\n') {
-				if (stack.getTop() == '(') {
-					stack.pop();
-				}
-				else {
-					strPostfix += stack.pop();
-					strPostfix += ' ';
-				}
-			}
-			break;
-		//////////////////
-		case '+':
-		case '-':
-			stack.push(current);
-			break;
-		//////////////////
-		case '*':
-		case '/':
-			stack.push(current);
-			if (infix[i + 1] == '(') {
+				break;
+			case '\n':
+				;
+				return;
+			default:
+				strPostfix += infix[i];
+				strPostfix += ' ';
 				break;
 			}
-			i++;
-			current = infix[i];
-			strPostfix += current;
-			strPostfix += ' ';
-			strPostfix += stack.pop();
-			strPostfix += ' ';
-			break;
-		case '\n':
-			;
-			return;
-		default:
-			strPostfix += infix[i];
-			strPostfix += ' ';
-			break;
+
 		}
-		
+		////////////////////////////////
+		while (stack.getTop() != '\n') {
+			if (stack.getTop() == '(') {
+				stack.pop();
+			}
+			else {
+				strPostfix += stack.pop();
+				strPostfix += ' ';
+			}
+		}
+		strcpy_s(postfix, strlen(strPostfix.c_str()) + 1, strPostfix.c_str());
+		postfix[strlen(postfix) + 1] = '\n';
 	}
-	////////////////////////////////
-	while (stack.getTop() != '\n') {
-		if (stack.getTop() == '(') {
-			stack.pop();
-		}
-		else {
-			strPostfix += stack.pop();
-			strPostfix += ' ';
-		}
+	////////////////////////////////////
+	catch (invalid_argument er) {
+		cerr << er.what() << '\n';
 	}
-	strcpy_s(postfix, strlen(strPostfix.c_str())+1, strPostfix.c_str());
-	postfix[strlen(postfix) + 1] = '\n';
 	////////////////////////////////////////////////////////////////////
+}
+
+void test01() {
+	try {
+		cout << '\n' << '\n' << '\n';
+		cout << "			" << " ######## " << "	" << "   ##   " << '\n';
+		cout << "			" << "##      ##" << "	" << "  ###   " << '\n';
+		cout << "			" << "##      ##" << "	" << " # ##   " << '\n';
+		cout << "			" << "##      ##" << "	" << "   ##   " << '\n';
+		cout << "			" << "##      ##" << "	" << "   ##   " << '\n';
+		cout << "			" << " ######## " << "	" << "  ####  " << '\n';
+		cout << '\n' << '\n' << '\n';
+
+		////////////////////////////////////////////////////////////////////
+
+		string source = "5+(-7)+4*(5+6*(5+4)+(-9))/(5*5-8*8)";
+		string source2 = "((3+7)*(5-(2/(6+1))))-(4*(9-(8/2)))";
+		string source3 = "(9-((8*(7-(6/(5+4))))+(3*(2-1))))/((1+2)*(3-(4/(5+6))))";
+		string source4 = "(9+(4-4)+3+4)";
+
+		eraseWrongSymbols(source);
+		eraseWrongSymbols(source2);
+		eraseWrongSymbols(source3);
+		eraseWrongSymbols(source4);
+
+		const char* infix = source.c_str();
+		char* postfix = new char[(strlen(infix) * 2) + 2];
+		const char* infix2 = source2.c_str();
+		char* postfix2 = new char[(strlen(infix) * 2) + 2];
+		const char* infix3 = source3.c_str();
+		char* postfix3 = new char[(strlen(infix) * 2) + 2];
+		const char* infix4 = source4.c_str();
+		char* postfix4 = new char[(strlen(infix) * 2) + 2];
+
+		getPostfixFromInfix(infix, postfix);
+		getPostfixFromInfix(infix2, postfix2);
+		getPostfixFromInfix(infix3, postfix3);
+		getPostfixFromInfix(infix4, postfix4);
+
+		cout << "1) " << infix << " -> " << postfix << '\n';
+		cout << "2) " << infix2 << " -> " << postfix2 << '\n';
+		cout << "3) " << infix3 << " -> " << postfix3 << '\n';
+		cout << "4) " << infix4 << " -> " << postfix4 << '\n';
+
+		delete[] postfix;
+		delete[] postfix2;
+		delete[] postfix3;
+		delete[] postfix4;
+
+		////////////////////////////////////////////////////////////////////
+
+		cout << "----------------------------------------------" << '\n';
+	}
+	catch (bad_alloc er) {
+		cerr << '\n' << er.what() << '\n';
+		return;
+	}
+}
+
+void test02() {
+	cout << '\n' << '\n' << '\n';
+	cout << "			" << " ######## " << "	" << "########" << '\n';
+	cout << "			" << "##      ##" << "	" << "      ##" << '\n';
+	cout << "			" << "##      ##" << "	" << "    ##  " << '\n';
+	cout << "			" << "##      ##" << "	" << "  ##    " << '\n';
+	cout << "			" << "##      ##" << "	" << "##      " << '\n';
+	cout << "			" << " ######## " << "	" << "########" << '\n';
+	cout << '\n' << '\n' << '\n';
+
+	////////////////////////////////////////////////////////////////////
+
+	string source = "5+(-7)+4*(5+6**4";
+	string source2 = ")(3+7)*(5-(2/(6+1))))-(4*(9-(8/2)))";
+	string source3 = "9-8*7-6/5+4))))+(3*(2-1))))/((1+2)*(3-(4/(5+6))))";
+	string source4 = "(943+(4-4)+3+4)";
+
+	eraseWrongSymbols(source);
+	eraseWrongSymbols(source2);
+	eraseWrongSymbols(source3);
+	eraseWrongSymbols(source4);
+
+	const char* infix = source.c_str();
+	char* postfix = new char[(strlen(infix) * 2) + 2];
+	const char* infix2 = source2.c_str();
+	char* postfix2 = new char[(strlen(infix) * 2) + 2];
+	const char* infix3 = source3.c_str();
+	char* postfix3 = new char[(strlen(infix) * 2) + 2];
+	const char* infix4 = source4.c_str();
+	char* postfix4 = new char[(strlen(infix) * 2) + 2];
+
+	cout << "1) " << infix << " -> ";
+	getPostfixFromInfix(infix, postfix);
+	cout << "2) " << infix2 << " -> ";
+	getPostfixFromInfix(infix2, postfix2);
+	cout << "3) " << infix3 << " -> ";
+	getPostfixFromInfix(infix3, postfix3);
+	cout << "4) " << infix4 << " -> ";
+	getPostfixFromInfix(infix4, postfix4);
+
+	delete[] postfix;
+	delete[] postfix2;
+	delete[] postfix3;
+	delete[] postfix4;
+
+	////////////////////////////////////////////////////////////////////
+
+	cout << "----------------------------------------------" << '\n';
+}
+
+void test03() {
+	cout << '\n' << '\n' << '\n';
+	cout << "			" << " ######## " << "	" << " ###### " << '\n';
+	cout << "			" << "##      ##" << "	" << "#     ##" << '\n';
+	cout << "			" << "##      ##" << "	" << "   #####" << '\n';
+	cout << "			" << "##      ##" << "	" << "      ##" << '\n';
+	cout << "			" << "##      ##" << "	" << "#     ##" << '\n';
+	cout << "			" << " ######## " << "	" << " ###### " << '\n';
+	cout << '\n' << '\n' << '\n';
+
+	////////////////////////////////////////////////////////////////////
+
+	string source = "5+(-7)+4*(5+6*   (5   +4)+(-   9))/(5*5-8*8)";
+	string source2 = "((3+7)*(5sd-(2/(6+1)))fd)-(4*(9a-(8/2)))";
+	string source3 = "(9-((8*@@(7-(6/(5+//4))))+(3*(2-1))))/((1+2)*(3-(4/(5+6))))";
+	string source4 = "(9+(4-4)+3+4) = 43";
+
+	eraseWrongSymbols(source2);
+	eraseWrongSymbols(source3);
+
+	const char* infix = source.c_str();
+	char* postfix = new char[(strlen(infix) * 2) + 2];
+	const char* infix2 = source2.c_str();
+	char* postfix2 = new char[(strlen(infix) * 2) + 2];
+	const char* infix3 = source3.c_str();
+	char* postfix3 = new char[(strlen(infix) * 2) + 2];
+	const char* infix4 = source4.c_str();
+	char* postfix4 = new char[(strlen(infix) * 2) + 2];
+
+	cout << "1) " << source << " -> ";
+	eraseWrongSymbols(source);
+	getPostfixFromInfix(infix, postfix);
+	cout << postfix << '\n';
+	cout << "2) " << infix2 << " -> ";
+	getPostfixFromInfix(infix2, postfix2);
+	cout << "3) " << infix3 << " -> ";
+	getPostfixFromInfix(infix3, postfix3);
+	cout << "4) " << source4 << " -> ";
+	eraseWrongSymbols(source4);
+	getPostfixFromInfix(infix4, postfix4);
+	cout << postfix4 << '\n';
+
+	delete[] postfix;
+	delete[] postfix2;
+	delete[] postfix3;
+	delete[] postfix4;
+
+	////////////////////////////////////////////////////////////////////
+
+	cout << "----------------------------------------------" << '\n';
+}
+
+void test04() {
+	cout << '\n' << '\n' << '\n';
+	cout << "			" << " ######## " << "	" << "##    ##" << '\n';
+	cout << "			" << "##      ##" << "	" << "##    ##" << '\n';
+	cout << "			" << "##      ##" << "	" << "########" << '\n';
+	cout << "			" << "##      ##" << "	" << "      ##" << '\n';
+	cout << "			" << "##      ##" << "	" << "      ##" << '\n';
+	cout << "			" << " ######## " << "	" << "      ##" << '\n';
+	cout << '\n' << '\n' << '\n';
+
+	////////////////////////////////////////////////////////////////////
+	StackList<char> stack;
+	char char1 = '3';
+	char char2 = '4';
+	char char3 = 'd';
+	char char4 = '=';
+
+	stack.print();
+	stack.push(char1);
+	stack.print();
+	stack.push(char2);
+	stack.print();
+	stack.push(char3);
+	stack.print();
+	stack.push(char4);
+	stack.print();;
+	cout << stack.pop() << '\n';
+	stack.print();
+	cout << stack.pop() << '\n';
+	stack.print();
+	cout << stack.pop() << '\n';
+	stack.print();
+	cout << stack.pop() << '\n';
+	stack.print();
+	cout << stack.pop();
+
+	////////////////////////////////////////////////////////////////////
+
+	cout << "----------------------------------------------" << '\n';
+
+}
+
+void test05() {
+	cout << '\n' << '\n' << '\n';
+	cout << "			" << " ######## " << "	" << "########" << '\n';
+	cout << "			" << "##      ##" << "	" << "##      " << '\n';
+	cout << "			" << "##      ##" << "	" << "####### " << '\n';
+	cout << "			" << "##      ##" << "	" << "      ##" << '\n';
+	cout << "			" << "##      ##" << "	" << "      ##" << '\n';
+	cout << "			" << " ######## " << "	" << "####### " << '\n';
+	cout << '\n' << '\n' << '\n';
+
+	////////////////////////////////////////////////////////////////////
+	string source;
+	getline(cin, source);
+
+	eraseWrongSymbols(source);
+	const char* infix = source.c_str();
+	char* postfix = new char[(strlen(infix) * 2) + 2];
+	if (checkWrongSymbols(source)) {
+		getPostfixFromInfix(infix, postfix);
+		cout << "1) " << infix << " -> " << postfix << '\n';
+	}
+	else {
+		cerr << "your arithmetic expression is uncorrect" << '\n';
+	}
+	delete[] postfix;
+	////////////////////////////////////////////////////////////////////
+
+	cout << "----------------------------------------------" << '\n';
 }

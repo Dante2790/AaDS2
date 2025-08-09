@@ -16,6 +16,7 @@ template <typename T>
 void StackList<T>::push(const T& data) {
 	try {
 		Node* new_node = new Node(data);
+		if (!new_node) { throw StackOverflow("stack is overflow"); }
 		switch (this->isEmpty()) {
 		case false:
 			
@@ -27,9 +28,8 @@ void StackList<T>::push(const T& data) {
 			this->top = new_node;
 			break;
 		}
-		//cout << data << "\n";
 	}
-	catch (out_of_range er) {
+	catch (StackUnderflow er) {
 		cerr << "error: " << er.what() << "\n";
 		return;
 	}
@@ -42,7 +42,7 @@ template <typename T>
 T StackList<T>::pop() {
 	try {
 		if (this->isEmpty()) {
-			throw out_of_range("stack is empty");
+			throw StackUnderflow("stack is empty");
 		}
 		T current = this->top->data;
 		Node* current_next = this->top->next;
@@ -53,12 +53,11 @@ T StackList<T>::pop() {
 		else {
 			this->top = nullptr;
 		}
-		//cout << current << '\n';
 		return current;
 	}
-	catch (out_of_range er) {
-		cerr << "error: " << er.what() << "\n";
-		T er_current = '~\n';
+	catch (StackUnderflow er) {
+		cerr << "error: " << er.what();
+		T er_current = '\n';
 		return er_current;
 	}
 }
@@ -66,7 +65,7 @@ template <typename T>
 void StackList<T>::print() {
 	try {
 		if (this->isEmpty()) {
-			throw out_of_range("stack is empty");
+			throw StackUnderflow("stack is empty");
 		}
 		Node* current = this->top;
 		while (current) {
@@ -80,7 +79,7 @@ void StackList<T>::print() {
 			current = current->next;
 		}
 	}
-	catch (out_of_range er) {
+	catch (StackUnderflow er) {
 		cerr << "error: " << er.what() << "\n";
 	}
 }
