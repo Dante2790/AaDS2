@@ -34,6 +34,11 @@ private:
 		return this->counter == 0;
 	}
 
+	QueueVector(const QueueVector& other) = delete;
+	QueueVector(QueueVector& other) = delete;
+	QueueVector& operator= (const QueueVector& other) = delete;
+	QueueVector& operator= (QueueVector& other) = delete;
+
 	//////////////////////////////////////////////////
 	class QueueOverflow : public std::overflow_error {
 	private:
@@ -70,6 +75,8 @@ public:
 	~QueueVector() {
 		delete[] data;
 	};
+
+	
 
 	/// <summary>
 	/// this method will output all the contents of the queue
