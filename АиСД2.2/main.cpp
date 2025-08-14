@@ -1,9 +1,11 @@
 #include "QueueVector.h"
 
 void test01();
+void test02();
 
 int main() {
 	test01();
+	test02();
 	return 0;
 }
 void test01() {
@@ -217,6 +219,76 @@ void test01() {
 	queue.print();
 	queue.enQueue(12);
 	queue.print();
+
+	////////////////////////////////////////////////////////////////////
+
+	std::cout << "----------------------------------------------" << '\n';
+}
+
+void test02() {
+	std::cout << '\n' << '\n' << '\n';
+	std::cout << "			" << " ######## " << "	" << "########" << '\n';
+	std::cout << "			" << "##      ##" << "	" << "      ##" << '\n';
+	std::cout << "			" << "##      ##" << "	" << "    ##  " << '\n';
+	std::cout << "			" << "##      ##" << "	" << "  ##    " << '\n';
+	std::cout << "			" << "##      ##" << "	" << "##      " << '\n';
+	std::cout << "			" << " ######## " << "	" << "########" << '\n';
+	std::cout << '\n' << '\n' << '\n';
+
+	////////////////////////////////////////////////////////////////////
+
+	QueueVector<int> queue;
+	queue.enQueue(1);
+	queue.enQueue(2);
+	queue.enQueue(3);
+	queue.enQueue(4);
+	queue.print();
+	
+	std::cout << '\n' << '\n' << '\n';
+
+	queue.deQueue();
+	queue.enQueue(1);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(1);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(1);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(1);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(1);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(1);
+	queue.print();
+
+	std::cout << '\n' << '\n' << '\n';
+
+	queue.enQueue(1);
+	queue.enQueue(2);
+	queue.enQueue(3);
+	queue.enQueue(4);
+	queue.print();
+
+	std::cout << '\n' << '\n' << '\n';
+
+	queue.deQueue();
+	queue.enQueue(5);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(6);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(7);
+	queue.print();
+	queue.deQueue();
+	queue.enQueue(8);
+	queue.print();
+
+	////////////////////////////////////////////////////////////////////
 
 	std::cout << "----------------------------------------------" << '\n';
 }
